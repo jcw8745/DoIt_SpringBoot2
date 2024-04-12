@@ -4,7 +4,6 @@ import java.security.Principal;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +21,10 @@ import com.mysite.sbb.user.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 @RequestMapping("/question")
 @RequiredArgsConstructor
 @Controller	
@@ -37,6 +38,8 @@ public class QuestionController {
 //	@ResponseBody
 	public String list(Model model , @RequestParam(value="page", defaultValue="0") int page
 			, @RequestParam(value="kw", defaultValue = "") String kw) {
+		
+		log.info("page: {}, kw: {}",page,kw);
 		
 //		List<Question> questionList = this.questionService.getList();
 		Page<Question> paging = this.questionService.getList(page,kw);
@@ -64,6 +67,7 @@ public class QuestionController {
 	}
 	
 	@PreAuthorize("isAuthenticated()")
+//	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/create")
 //	@ResponseBody
 	public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal) {
