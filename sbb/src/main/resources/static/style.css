@@ -5,3 +5,11 @@ textarea{
 input[type=submit] {
 	margin-top:10px;
 }
+
+body {
+  background: rgb(254, 194, 62);
+}
+
+/*nav{*/
+/*	margin-top:100px;*/
+/*}*/
