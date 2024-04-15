@@ -104,10 +104,8 @@
 	
 	//공지사항 모달 오픈 ( 로그인시)
 	$(document).ready(function() {
-		const loginYn = document.getElementById("loginValue").value;
-		if(loginYn =="1"){
+		
 			openPopup();
-		}
 	});
 
 	
@@ -143,13 +141,15 @@
 	        }
 	
 	        function openPopup() {
-				debugger;
+				const loginYn = document.getElementById("loginValue").value;
 	            var eventCookie = getCookie("popup");
-				if(eventCookie == ""){
-					$('#popup').modal("show");
-				}
-				if (eventCookie != "" && eventCookie != "no") {
-				    $('#popup').modal();
+				if(loginYn =="1"){
+					if(eventCookie == ""){
+						$('#popup').modal("show");
+					}
+					if (eventCookie != "" && eventCookie != "no") {
+					    $('#popup').modal();
+					}
 				}
 	        }
 	
