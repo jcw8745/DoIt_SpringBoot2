@@ -1,5 +1,5 @@
 <html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
+<div layout:fragment="content" class="container my-3" style="width: 55%;">
 	
 	<div class="my-3 border-bottom">
 		<div>
@@ -14,6 +14,22 @@
 			<input type="text" th:field="*{username}" class="form-control">
 		</div>
 		
+		<p>
+		  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+		   	닉네임 등록
+		  </a>
+		</p>
+		<div class="collapse" id="collapseExample">
+		  <div class="card card-body">
+			<div class="mb-3">
+				<label for="nickName" class="form-label">닉네임(별명)</label>
+				<input type="text" th:field="*{nickName}" class="form-control">
+			</div>
+		  </div>
+		</div>
+		
+
+		
 		<div class="mb-3">
 			<label for="password1" class="form-label">비밀번호</label>
 			<input type="password" th:field="*{password1}" class="form-control">
@@ -24,13 +40,128 @@
 			<input type="password" th:field="*{password2}" class="form-control">
 		</div>
 		
+		<div class="row g-2">
+		  <div class="col-md">
+		    <div class="form-floating">
+		      <input type="email" class="form-control" id="floatingInputGrid" th:field="*{email}" placeholder="name@example.com" >
+			  <label for="email">이메일 주소</label>
+		    </div>
+		  </div>
+		</div>
+		
 		<div class="mb-3">
-			<label for="email" class="form-label">이메일</label>
-			<input type="email" th:field="*{email}" class="form-control">
+			<label for="phoneNumber" class="form-label">전화번호</label>
+			<input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="form-control">
+		</div>
+		
+		<div class="mb-3">
+			<label for="birth" class="form-label">생년월일</label>
+			<input type="text" id="birth" th:field="*{birth}" placeholder="YYYYMMDD(8자리)" class="form-control">
+		</div>
+		
+		<div class="mb-1">
+			<label for="birth" class="form-label">성별</label>
+		</div>
+		
+<!--		<div class="btn-group" th:each="type : ${genders}" role="group" aria-label="Basic radio toggle button group">-->
+<!--		  <input type="radio" th:field="${item.genders}" th:value="${type.name()}" class="btn-check" name="btnradio"  autocomplete="off"checked>-->
+<!--		  <label class="btn btn-outline-primary" th:for="${#ids.prev('genders')}" th:text="${type.gender}"></label>-->
+<!--		</div>-->
+		
+		<div th:each="type : ${genders}" class="form-check form-check-inline">
+		    <input type="radio" th:field="*{gender}" th:value="${type.name()}"
+		           class="form-check-input">
+		    <label th:for="${#ids.prev('gender')}" th:text="${type.gender}"
+		           class="form-check-label">
+		    </label>
+		</div>
+		
+		<div class="mb-3">
+			<label for="address" class="form-label">주소1</label>
+			<input type="text" th:field="*{address1}" class="form-control">
+			<label for="address2" class="form-label">주소2</label>
+			<input type="text" th:field="*{address2}" class="form-control">
 		</div>
 		
 		<button type="submit" class="btn btn-primary">회원 가입</button>
 	</form>
 	
 </div>	
+
+<script th:src="@{/jquery-3.7.1.js}"></script>
+<script layout:fragment="script" type='text/javascript'>
+	$(document).ready(function() {
+		
+		//핸드폰 번호 유효성 검사
+	     $("#phoneNumber").blur(function() {
+	         // 입력된 전화번호 가져오기
+	         var phoneNumber = $("#phoneNumber").val();
+			 
+			    // 입력된 문자열에서 하이픈('-')을 제거하여 숫자만 추출
+			    var pcs = phoneNumber.replace(/[^0-9]/g, '');
+			 
+			    // 전화번호 형식 (010-1234-5678)으로 변환
+			    if (pcs.length === 10) {
+			        pcs = pcs.substring(0, 3) + '-' + pcs.substring(3, 7) + '-' + pcs.substring(7, 11);
+			    } else if (pcs.length === 11) {
+			        pcs = pcs.substring(0, 3) + '-' + pcs.substring(3, 7) + '-' + pcs.substring(7, 11);
+			    }
+			 
+			    $("#phoneNumber").val(pcs);
+	         if(pcs) {
+	             // 정규식을 사용하여 형식 검사
+	             var regex = /^(01[0-9]{1}-?[0-9]{4}-?[0-9]{4}|01[0-9]{8})$/;
+	
+	             if (regex.test(pcs)) {
+	                 // 올바른 형식일 경우
+	             } else {
+	                 // 잘못된 형식일 경우
+	                 alert("잘못된 형식의 전화번호 입니다.");
+	                 $("#phoneNumber").val("");
+	             }
+	         }
+	     });
+		 
+		 //생년월일 유효성 검사
+		 $("#birth").blur(function() {
+			
+		 var data = $("#birth").val();
+		 var data1 = data.replace(/[^0-9]/g, '');
+		 if(data1.length == 8){
+		 
+		 if (data1.length === 8) {
+			data1 = data1.substring(0, 4) + '-' + data1.substring(4, 6) + '-' + data1.substring(6, 8);
+		 }
+		 $("#birth").val(data1);
+		 var y = parseInt(data1.substr(0, 4), 10);
+		 var m = parseInt(data1.substr(5, 2), 10);
+		 var d = parseInt(data1.substr(8, 2), 10);
+		 
+		 var dt = new Date(y, m-1, d);
+		 
+
+		 if(dt.getDate() != d) { alert("일이 유효하지 않음"); }
+		 else if(dt.getMonth()+1 != m) { alert("월이 유효하지 않음"); }
+		 else if(dt.getFullYear() != y) { alert("년도가 유효하지 않음"); }
+		 else { }
+		
+		 }else{
+			alert("생년월일을 8자리로 입력해주세요.");
+			$("#birth").val("");
+		 }
+		 
+		 });
+		 
+		 
+		 
+		 $("input[name='btnradio']").click(function() {
+			alert($("input[name='btnradio']:checked").attr('id'));
+			});
+			
+		
+		 
+	 });
+	 
+
+</script>
 </html>

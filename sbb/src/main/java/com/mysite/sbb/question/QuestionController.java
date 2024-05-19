@@ -2,8 +2,15 @@ package com.mysite.sbb.question;
 
 import java.security.Principal;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.mysite.sbb.answer.AnswerForm;
@@ -24,6 +32,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
+@PropertySource("/config.properties")
+
+
 @Slf4j
 @RequestMapping("/question")
 @RequiredArgsConstructor
@@ -33,11 +44,21 @@ public class QuestionController {
 	private final QuestionService questionService;
 	private final UserService userService;
 	
+	//.properties 값 가져오기
+	@Autowired
+    Environment env;
 	
 	@GetMapping("/list")
 //	@ResponseBody
 	public String list(Model model , @RequestParam(value="page", defaultValue="0") int page
 			, @RequestParam(value="kw", defaultValue = "") String kw) {
+		
+		
+		//.properties 값 가져오기
+		String a=env.getProperty("Test");
+		String b=env.getProperty("Test2");
+		System.out.println(a);
+		System.out.println(b);
 		
 		log.info("page: {}, kw: {}",page,kw);
 		
@@ -71,7 +92,32 @@ public class QuestionController {
 	@PostMapping("/create")
 //	@ResponseBody
 	public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal) {
-		
+		// RestTemplate 객체 생성
+		RestTemplate restTemplate = new RestTemplate();
+
+		// API 호출할 URL 지정
+		String apiUrl = env.getProperty("testApiUrl");
+	       // 요청에 포함될 데이터
+        String requestBody = "{\"key\": \"value\"}";
+
+        // 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // HttpEntity 객체 생성 (요청 데이터와 헤더 포함)
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // POST 요청 보내기
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
+
+        // 응답 데이터 출력
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseData = responseEntity.getBody();
+            System.out.println("Response from API: " + responseData);
+        } else {
+            System.out.println("Error occurred: " + responseEntity.getStatusCodeValue());
+        }
+        
 		if(bindingResult.hasErrors()) {
 			return "question_form";
 		}

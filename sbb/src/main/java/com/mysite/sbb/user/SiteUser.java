@@ -25,4 +25,18 @@ public class SiteUser {
 	@Column(unique = true)
 	private String email;
 	
+	private String nickName;
+	
+	private String birth;
+	
+	private String phoneNumber;
+	
+
+	
+	private String gender;
+	
+	private String address1;
+	
+	private String address2;
+	
 }
