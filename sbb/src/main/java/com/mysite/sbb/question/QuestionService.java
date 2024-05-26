@@ -105,6 +105,7 @@ public class QuestionService {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("fileInfo", fileInfo.getResource());
         body.add("user", user.getUsername());
+        body.add("location", "question_form"); //TODO 위치정보 어떻게 설정할지 고민중.
         // 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);

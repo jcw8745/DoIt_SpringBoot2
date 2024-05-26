@@ -25,5 +25,7 @@ public class FileTb {
 	
 	private String userPath;
 	
-	private Byte fileSize;
+	private long fileSize;
+	
+	private String mimeType;
 }
