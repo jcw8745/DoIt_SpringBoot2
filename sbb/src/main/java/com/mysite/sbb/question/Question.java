@@ -47,4 +47,6 @@ public class Question {
 	@ManyToMany
 	Set<SiteUser> voter;
 	
+	private String fileId;
+	
 }

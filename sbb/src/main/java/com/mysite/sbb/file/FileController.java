@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -49,30 +50,32 @@ public class FileController {
 	}
 	
 	@PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) {
+	public ResponseEntity<String> uploadFile(@RequestParam("fileInfo") MultipartFile fileInfo,@RequestParam("user") String user) {
 		
-		int result=0;
-		
-		//.properties 값 가져오기
-		String uploadsDir=env.getProperty("AllFileLocation");
-		//TODO 서비스 호출하여 반환받은 값으로 성공 실패 처리
-
-		
-		 result = fileService.uploadallfile(file,uploadsDir);
-	       
-	        return "ddddddddddddddddddddddddddddddddddddddddddddddd";
+        // 요청 바디를 받아와서 처리
+        System.out.println("Received POST request with body:--fileInfo: "+fileInfo.getResource());
+        //TODO 서비스는 return값 (String)fileId로  api 호출한곳으로는 responseData로 구현
+        
+        // 처리 결과를 클라이언트에 응답
+        String responseData = fileService.uploadallfile(fileInfo, "" , user); //TODO fileId 보내기
+        if(!responseData.toString().equals("FAIL")) {
+        	return new ResponseEntity<>(responseData, HttpStatus.OK);
+        }else {
+        	return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
 	    
 	}
 	
 	@PostMapping("/apitest")
-	public ResponseEntity<String> handlePostRequest(@RequestBody String requestBody){
+	public ResponseEntity<String> handlePostRequest( @RequestParam("fileInfo") MultipartFile fileInfo){
 		
         // 요청 바디를 받아와서 처리
-        System.out.println("Received POST request with body: " + requestBody);
-        //TODO 서비스는 return값 0,1로  api 호출한곳으로는 responseData로 구현
+        System.out.println("Received POST request with body:--fileInfo: "+fileInfo.getResource());
+        //TODO 서비스는 return값 (String)fileId로  api 호출한곳으로는 responseData로 구현
         
         // 처리 결과를 클라이언트에 응답
-        String responseData = "Received POST request successfully!";
+        String responseData = "Received POST request successfully!"; //TODO fileId 보내기
         return new ResponseEntity<>(responseData, HttpStatus.OK);
 	    
 	}

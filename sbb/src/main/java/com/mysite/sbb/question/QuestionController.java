@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.mysite.sbb.answer.AnswerForm;
@@ -91,38 +92,15 @@ public class QuestionController {
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PostMapping("/create")
 //	@ResponseBody
-	public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal) {
-		// RestTemplate 객체 생성
-		RestTemplate restTemplate = new RestTemplate();
+	public String questionCreate(@RequestParam("fileInfo") MultipartFile fileInfo, @Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal) {
 
-		// API 호출할 URL 지정
-		String apiUrl = env.getProperty("testApiUrl");
-	       // 요청에 포함될 데이터
-        String requestBody = "{\"key\": \"value\"}";
-
-        // 요청 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // HttpEntity 객체 생성 (요청 데이터와 헤더 포함)
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        // POST 요청 보내기
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
-
-        // 응답 데이터 출력
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            String responseData = responseEntity.getBody();
-            System.out.println("Response from API: " + responseData);
-        } else {
-            System.out.println("Error occurred: " + responseEntity.getStatusCodeValue());
-        }
         
 		if(bindingResult.hasErrors()) {
 			return "question_form";
 		}
 		SiteUser siteUser = this.userService.getUser(principal.getName());
-		this.questionService.create(questionForm.getSubject(),questionForm.getContent(),siteUser);
+		this.questionService.create(questionForm.getSubject(),questionForm.getContent(),siteUser,fileInfo);
+		
 		
 		return "redirect:/question/list"; //질문 저장 후 질문 목록으로 이동
 	}

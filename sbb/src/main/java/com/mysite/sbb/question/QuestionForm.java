@@ -17,5 +17,7 @@ public class QuestionForm {
 	private String content;
 	
 //	private String adminRole;
+	
+	private String fileId;
 
 }

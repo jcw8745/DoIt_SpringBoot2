@@ -23,5 +23,4 @@ public class MainController {
 		return "main_form";
 		
 	}
-	
 }

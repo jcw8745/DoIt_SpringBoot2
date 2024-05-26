@@ -4,13 +4,24 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mysite.sbb.DataNotFoundException;
 import com.mysite.sbb.answer.Answer;
@@ -30,6 +41,9 @@ public class QuestionService {
 	
 
 	private final QuestionRepository questionRepository;
+	//.properties 값 가져오기
+	@Autowired
+    Environment env;
 	
 	private Specification<Question> search(String kw) {
 		return new Specification<>() {
@@ -70,12 +84,45 @@ public class QuestionService {
 		
 	}
 	
-	public void create(String subject, String content, SiteUser user) {
+	public void create(String subject, String content, SiteUser user ,MultipartFile fileInfo) {
 		Question q = new Question();
 		q.setSubject(subject);
 		q.setContent(content);
 		q.setCreateDate(LocalDateTime.now());
 		q.setAuthor(user);
+		
+		String makeFileId = "";
+		
+		
+		//TODO 파일아이디 생성후 파일등록 API 호출
+		// RestTemplate 객체 생성
+		RestTemplate restTemplate = new RestTemplate();
+
+		// API 호출할 URL 지정
+		String apiUrl = env.getProperty("fileApiUrl");
+	    // 요청에 포함될 데이터
+	    // 멀티파트 요청을 위한 데이터 설정
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("fileInfo", fileInfo.getResource());
+        body.add("user", user.getUsername());
+        // 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        // HttpEntity 객체 생성 (요청 데이터와 헤더 포함)
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        // POST 요청 보내기
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
+        // 응답 데이터 출력
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            String responseData = responseEntity.getBody();
+            System.out.println("Response from API: " + responseData);
+            makeFileId = responseData;//TODO 리스폰스데이터에 파일아이디 줌
+        } else {
+            System.out.println("Error occurred: " + responseEntity.getStatusCodeValue());
+        }
+        
+        q.setFileId(makeFileId);
+        
 		this.questionRepository.save(q);
 	}
 	
