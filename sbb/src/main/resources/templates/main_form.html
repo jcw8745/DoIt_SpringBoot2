@@ -20,5 +20,124 @@
 	  <div>Third auto-column</div>
 	</div>
 	
+	<table>
+	<th>등록기간</th><td>
+	<input type="text" id="testDatepicker" maxlength="8">
+	</table>
+
 </div>
+
+
+<script layout:fragment="script" type='text/javascript'>
+	
+	
+	$(function(){
+		debugger;
+		//모든 datepicker에 대한 공통 옵션 설정
+		var thisDate = new Date();
+		var thisYear = thisDate.getFullYear();        //해당 연
+		var thisMonth = thisDate.getMonth() + 1;    //해당 월
+		var thisDay = thisDate.getDate();          //해당 일
+		
+		 $("#testDatepicker").datepicker(
+			{ 
+				dateFormat: 'yymmdd',
+				monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월','7월', '8월', '9월', '10월', '11월', '12월'],
+				dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+				weekHeader: 'Wk',
+				changeMonth: true, // 월변경가능
+				changeYear: true, // 년변경가능
+				yearRange: '2000:+5', // 연도 셀렉트 박스 범위
+				showMonthAfterYear: true, // 년 뒤에 월 표시
+				buttonText: '날짜를 선택하세요',
+				autoSize: true, // 오토리사이즈(body등 상위태그의 설정에 따른다)
+				onClose: function( selectedDate ) {
+					
+					if( selectedDate.length != 8){
+						alert("날짜 수기 입력시 8자리로 입력 해주세요");
+					}else{
+						//TODO 유효성체크 로직
+					
+						_fnisDate(selectedDate);
+					}
+					alert(selectedDate.length);
+					
+				}
+			});
+			
+			$('#testDatepicker').datepicker('setDate', thisYear+'-'+thisMonth+'-'+thisDay);
+			
+
+		
+	});
+		
+		
+		
+		
+		//날짜 유효성 체크 (윤달 포함)
+		function _fnisDate(vDate) {
+			debugger;
+			var vValue = vDate;
+			var vValue_Num = vValue.replace(/[^0-9]/g, ""); //숫자를 제외한 나머지는 예외처리 합니다.
+			
+		    //_fnToNull 함수는 아래 따로 적어두겠습니다. 
+			if (_fnToNull(vValue_Num) == "") {
+				alert("날짜를 입력 해 주세요.");
+				return false;
+			}
+		
+			//8자리가 아닌 경우 false
+			if (vValue_Num.length != 8) {
+				alert("날짜를 20200101 or 2020-01-01 형식으로 입력 해 주세요.");
+				return false;
+			}
+			
+		    //8자리의 yyyymmdd를 원본 , 4자리 , 2자리 , 2자리로 변경해 주기 위한 패턴생성을 합니다.
+			var rxDatePattern = /^(\d{4})(\d{1,2})(\d{1,2})$/; 
+			var dtArray = vValue_Num.match(rxDatePattern); 
+		
+			if (dtArray == null) {
+				return false;
+			}
+		
+			//0번째는 원본 , 1번째는 yyyy(년) , 2번재는 mm(월) , 3번재는 dd(일) 입니다.
+			dtYear = dtArray[1];
+			dtMonth = dtArray[2];
+			dtDay = dtArray[3];
+		
+			//yyyymmdd 체크
+			if (dtMonth < 1 || dtMonth > 12) {
+				alert("존재하지 않은 월을 입력하셨습니다. 다시 한번 확인 해주세요");
+				return false;
+			}
+			else if (dtDay < 1 || dtDay > 31) {
+				alert("존재하지 않은 일을 입력하셨습니다. 다시 한번 확인 해주세요");
+				return false;
+			}
+			else if ((dtMonth == 4 || dtMonth == 6 || dtMonth == 9 || dtMonth == 11) && dtDay == 31) {
+				alert("존재하지 않은 일을 입력하셨습니다. 다시 한번 확인 해주세요");
+				return false;
+			}
+			else if (dtMonth == 2) {
+				var isleap = (dtYear % 4 == 0 && (dtYear % 100 != 0 || dtYear % 400 == 0));
+				if (dtDay > 29 || (dtDay == 29 && !isleap)) {
+					alert("존재하지 않은 일을 입력하셨습니다. 다시 한번 확인 해주세요");
+					return false;
+				}
+			}
+		
+			return true;
+		}
+		
+		//Null 값 ""
+		function _fnToNull(data) {
+		    // undifined나 null을 null string으로 변환하는 함수. 
+		    if (String(data) == 'undefined' || String(data) == 'null') {
+		        return ''
+		    } else {
+		        return data
+		    }
+		}
+		
+</script>
 </html>

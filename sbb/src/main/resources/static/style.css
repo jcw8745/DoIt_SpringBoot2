@@ -10,6 +10,10 @@ body {
   background: rgb(254, 194, 62);
 }
 
+.datepicker{
+		max-width:110px;	text-align:center;	display:inline-block;
+}
+
 /*nav{*/
 /*	margin-top:100px;*/
 /*}*/
